@@ -30,16 +30,18 @@ const actions = {
             commit('updateUser', {name, email});
             window.localStorage.setItem('webtoken', token); //Stores the token in localstorage
             window.localStorage.setItem('user', JSON.stringify({name, email}));
+            commit('updateSocket');
         } else {
             commit('showAlert');
         }
         commit('updateLoading', false);
     },
-    logout({ commit }) { //Commit used to call mutations
+    logout({ commit, rootState }) { //Commit used to call mutations
         commit('updateToken', null);
         commit('updateUser', null);
         window.localStorage.removeItem('webtoken');
         window.localStorage.removeItem('user');
+        rootState.users.socket.disconnect();
     },
 };
 

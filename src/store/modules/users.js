@@ -1,7 +1,7 @@
 import io from 'socket.io-client';
 
 const state = {
-    socket: io.connect('localhost:3000', {
+    socket: io('localhost:3000', {
         query: {token: window.localStorage.getItem('webtoken')}
     }),
     users: []
@@ -22,6 +22,12 @@ const actions = {
 const mutations = {
     setUsers(state, users) {
         state.users = users;
+    },
+    updateSocket(state){
+        state.socket.disconnect();
+        state.socket = io('localhost:3000', {
+            query: {token: window.localStorage.getItem('webtoken')}
+        })
     }
 };
 

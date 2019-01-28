@@ -50,10 +50,11 @@
     export default {
         name: 'LoginForm',
         methods: {
-            ...mapActions(['onSubmit']),
-            onClick(e){
+            ...mapActions(['onSubmit', 'fetchUsers']),
+            async onClick(e){
                 e.preventDefault();
-                this.onSubmit();
+                await this.onSubmit();
+                this.fetchUsers(); //Need to fetchusers here because of token validation.
             },
             dismiss(){
                 this.$store.commit('dismissAlert')

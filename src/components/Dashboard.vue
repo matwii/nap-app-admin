@@ -1,70 +1,58 @@
 <template>
-    <div>
-        <div class="sidenav">
-            <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="#"><i class="fas fa-users"></i>Users</a>
-            <a href="#"><i class="fas fa-car"></i>Cars</a>
-            <a href="#"><i class="fas fa-taxi"></i>Rides</a>
-        </div>
-        <div class="main">
-            Number of users: {{getUsers ? getUsers.length : 0}}
-        </div>
+    <div class="dashboard-main">
+        <b-card bg-variant="primary"
+                text-variant="white"
+                class="card">
+            <blockquote class="card-blockquote">
+                <i class="fas fa-users fa-5x"></i>
+                <p style="font-size: 18px">{{getUsers ? getUsers.length : 0}} Users registered</p>
+            </blockquote>
+        </b-card>
+        <b-card bg-variant="success"
+                text-variant="white">
+            <blockquote class="card-blockquote">
+                <i class="fas fa-car fa-5x"></i>
+                <p style="font-size: 18px">{{getCars ? getCars.length : 0}} Cars registered</p>
+            </blockquote>
+        </b-card>
+        <b-card bg-variant="danger"
+                text-variant="white">
+            <blockquote class="card-blockquote">
+                <i class="fas fa-taxi fa-5x"></i>
+                <p style="font-size: 18px">{{getRides ? getRides.length : 0}} Rides registered</p>
+            </blockquote>
+        </b-card>
     </div>
 </template>
 
 <script>
-    import { mapActions, mapGetters } from 'vuex';
+    import {mapGetters} from 'vuex';
 
     export default {
         name: 'Dashboard',
-        methods: mapActions(['fetchUsers']),
-        computed: mapGetters(['getUsers']),
-        mounted() {
-            this.fetchUsers();
-        },
+        computed: mapGetters(['getUsers', 'getCars', 'getRides']),
     }
 </script>
 
 <style scoped>
-    .sidenav {
-        height: 100%;
-        width: 10em;
-        position: absolute;
-        z-index: 1;
-        left: 0;
-        background-color: #404040;
-        overflow-x: hidden;
-        padding-top: 20px;
+    .dashboard-main {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
     }
 
-    .sidenav a {
-        padding: 6px 8px 6px 16px;
-        text-decoration: none;
-        font-size: 18px;
-        color: #818181;
-        display: block;
+    .card {
+        width: 20em; /* Or whatever */
+        height: 200px; /* Or whatever */
+        margin: 20px 20px 100px 20px; /* Magic! */
     }
 
-    .sidenav a:hover {
-        color: #f1f1f1;
-    }
-
-    i {
-        width: 2em;
-    }
-
-    .fa-tachometer-alt{
-        width: 30px;
-    }
-
-    @media screen and (max-height: 450px) {
-        .sidenav {padding-top: 15px;}
-        .sidenav a {font-size: 18px;}
-    }
-
-    .main {
-        margin-left: 160px; /* Same as the width of the sidenav */
-        padding: 0px 10px;
+    .card-blockquote {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
     }
 </style>
 
