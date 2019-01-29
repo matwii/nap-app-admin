@@ -1,4 +1,5 @@
 import io from 'socket.io-client';
+import api from '../../api/rest-api';
 
 const state = {
     socket: io('localhost:3000', {
@@ -16,6 +17,14 @@ const actions = {
         state.socket.on('initial users', function (users) {
             commit('setUsers', users)
         })
+    },
+    deleteUser({commit}, userId) {
+        state.socket.emit('deleteUser', userId);
+    },
+    addUser({commit}, user) {
+        if (user){
+            state.socket.emit('addUser', user);
+        }
     }
 };
 

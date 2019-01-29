@@ -14,5 +14,15 @@ export default {
         } catch (e) {
             return 'No user found';
         }
+    },
+    async deleteUser(userId){
+        try {
+            const response = await axios.delete(`${ROOT_URL}/user/${userId}`, {
+                data: {token: window.localStorage.getItem('webtoken')}
+            });
+            console.log(response)
+        } catch (e) {
+            return 'Something went wrong'
+        }
     }
 }

@@ -1,6 +1,7 @@
 <template>
     <b-container fluid>
         <!-- User Interface controls -->
+        <AddUserForm />
         <b-row>
             <b-col md="6" class="my-1">
                 <b-form-group horizontal label="Filter" class="mb-0">
@@ -61,7 +62,7 @@
             <template slot="created" slot-scope="row">{{formatDate(row.item.created)}}</template>
             <template slot="actions" slot-scope="row">
                 <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-                <b-button size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
+                <b-button variant="danger" size="sm" @click.stop="info(row.item, row.index, $event.target)" class="mr-1">
                     Delete user
                 </b-button>
             </template>
@@ -72,38 +73,45 @@
             </b-col>
         </b-row>
         <!-- Info modal -->
-        <b-modal id="modalInfo" hide-footer @hide="resetModal" :title="modalInfo.title" ok-only>
+        <b-modal id="modalInfo" ref="myModalRef" hide-footer @hide="resetModal" :title="modalInfo.title" ok-only>
             <pre>{{ modalInfo.content }}</pre>
-            <b-button>Yes</b-button>
-            <b-button @click="resetModal">Cancel</b-button>
+            <b-button class="modal-button" variant="danger" style="" @click="onDelete">Yes</b-button>
+            <b-button class="modal-button" variant="outline-secondary" @click="hideModal">Cancel</b-button>
         </b-modal>
     </b-container>
 </template>
 
 <script>
-    import { mapGetters } from 'vuex';
+    import { mapGetters, mapActions } from 'vuex';
     import moment from 'moment';
+    import AddUserForm from './AddUserForm';
 
     export default {
         name: 'UserList',
+        components: {AddUserForm},
         data (){
             return {
                 fields: [
                     { key: 'name', label: 'Person Name', sortable: true, sortDirection: 'desc' },
                     { key: 'email', label: 'Email', sortable: true, 'class': 'text-center' },
                     { key: 'role', label: 'Role' },
-                    { key: 'created', label: 'Created date' },
+                    { key: 'created', label: 'Created date', sortable: true },
                     { key: 'actions', label: 'actions'}
                 ],
                 filter: null,
-                sortBy: null,
+                sortBy: 'name',
                 sortDesc: false,
                 totalRows: this.$store.getters.getUsers.length,
                 sortDirection: 'asc',
-                perPage: 10,
+                perPage: 5,
                 currentPage: 1,
-                pageOptions: [ 10, 15, 20 ],
-                modalInfo: {title: '', content: ''}
+                pageOptions: [ 5, 10, 15 ],
+                modalInfo: {title: '', content: '', userId: null},
+                userInfo: {name: '', email: '', password: '', role: null},
+                options: [
+                    { value: 1, text: 'Admin' },
+                    { value: 2, text: 'User' },
+                ]
             }
         },
         computed: {
@@ -116,10 +124,16 @@
             },
         },
         methods: {
-            info (item, index, button) {
+            ...mapActions(['deleteUser']),
+            info (item) {
                 this.modalInfo.title = 'Delete user';
                 this.modalInfo.content = `Are you sure you want to delete the user: ${item.name}?`;
-                this.$root.$emit('bv::show::modal', 'modalInfo', button);
+                this.modalInfo.userId = item.user_id;
+                this.showModal();
+            },
+            onDelete() {
+                this.deleteUser(this.modalInfo.userId);
+                this.hideModal();
             },
             onFiltered (filteredItems) {
                 // Trigger pagination to update the number of buttons/pages due to filtering
@@ -132,7 +146,21 @@
             resetModal() {
                 this.modalInfo.title = '';
                 this.modalInfo.content = '';
+            },
+            showModal () {
+                this.$refs.myModalRef.show()
+            },
+            hideModal () {
+                this.$refs.myModalRef.hide();
+                this.resetModal();
             }
         }
     }
 </script>
+
+<style scoped>
+    .modal-button {
+        margin-right: 10px;
+        width: 100px;
+    }
+</style>
