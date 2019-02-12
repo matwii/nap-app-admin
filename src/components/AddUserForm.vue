@@ -1,5 +1,6 @@
 <template>
     <div>
+        <h4>Add user</h4>
         <b-form @submit="onClick">
         <b-row>
             <b-col md="3" class="my-1">
