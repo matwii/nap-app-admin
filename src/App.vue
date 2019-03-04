@@ -30,7 +30,7 @@
             AppHeader,
         },
         computed: mapGetters(['isLoggedIn']), //We use computed property to read information into our component
-        methods: mapActions(['fetchUsers', 'fetchCars', 'fetchRides']),
+        methods: mapActions(['fetchUsers', 'fetchCars', 'fetchRides', 'fetchError']),
         created() {
             if (this.isLoggedIn){
                 this.fetchUsers();

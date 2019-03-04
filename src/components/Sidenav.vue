@@ -2,7 +2,7 @@
     <div class="sidenav">
         <router-link to="/"><i class="fas fa-tachometer-alt"></i> Dashboard</router-link>
         <router-link to="/users"><i class="fas fa-users"></i>Users</router-link>
-        <a href="#"><i class="fas fa-car"></i>Cars</a>
+        <router-link to="/cars"><i class="fas fa-car"></i>Cars</router-link>
         <a href="#"><i class="fas fa-taxi"></i>Rides</a>
     </div>
 </template>

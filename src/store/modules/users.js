@@ -5,7 +5,8 @@ const state = {
     socket: io('localhost:3000', {
         query: {token: window.localStorage.getItem('webtoken')}
     }),
-    users: []
+    users: [],
+    error: ''
 };
 
 const getters = {
@@ -14,7 +15,8 @@ const getters = {
      * @param state
      * @returns {Array|*|{state, getters, actions, mutations}}
      */
-    getUsers: (state) => state.users
+    getUsers: (state) => state.users,
+    getError: (state) => state.error
 };
 
 const actions = {
@@ -26,6 +28,11 @@ const actions = {
     fetchUsers({ state, commit }) {
         state.socket.on('initial users', function (users) {
             commit('setUsers', users)
+        })
+    },
+    fetchError({commit}){
+        state.socket.on('error', function (error) {
+            commit('setError', error)
         })
     },
     /**
@@ -56,6 +63,9 @@ const mutations = {
      */
     setUsers(state, users) {
         state.users = users;
+    },
+    setError(state, error){
+        state.error = error;
     },
     /**
      * Need this to update the socket after authenticating because we don't have the webtoken before we log in

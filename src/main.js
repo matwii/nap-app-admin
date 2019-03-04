@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Dashboard from './components/Dashboard'
 import UserList from './components/UserList'
-import moment from 'moment';
+import CarsList from './components/CarsList'
 
 Vue.use(VueRouter);
 Vue.use(BootstrapVue);
@@ -19,7 +19,8 @@ export const router = new VueRouter({
     mode: 'history', //Remove # from the url
     routes: [
         { path: '/', component: Dashboard},
-        { path: '/users', component: UserList},
+        { path: '/users', component: UserList },
+        { path: '/cars', component: CarsList },
         { path: '*', redirect: '/'}
     ]
 });

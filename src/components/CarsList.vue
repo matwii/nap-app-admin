@@ -1,7 +1,7 @@
 <template>
     <b-container fluid>
         <!-- User Interface controls -->
-        <AddUserForm />
+        <AddCarForm />
         <b-row>
             <b-col md="6" class="my-1">
                 <b-form-group horizontal label="Filter" class="mb-0">
@@ -46,7 +46,7 @@
         <!-- Main table element -->
         <b-table show-empty
                  stacked="md"
-                 :items="getUsers"
+                 :items="getCars"
                  :fields="fields"
                  :current-page="currentPage"
                  :per-page="perPage"
@@ -56,22 +56,20 @@
                  :sort-direction="sortDirection"
                  @filtered="onFiltered"
         >
-                <template slot="user_id" slot-scope="row">{{row.value}}</template>
-                <template slot="name" slot-scope="row">{{row.value}}</template>
-                <template slot="email" slot-scope="row">{{row.value}}</template>
-                <template slot="role" slot-scope="row">{{row.item.role_id === 1 ? 'Admin' : 'User'}}</template>
-                <template slot="created" slot-scope="row">{{formatDate(row.item.created)}}</template>
-                <template slot="actions" slot-scope="row">
-                    <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
-                    <div>
-                    <b-button variant="danger" size="sm" @click="info(row.item, row.index, $event.target)" class="mr-1">
-                        Delete user
+            <template slot="car_id" slot-scope="row">{{row.value}}</template>
+            <template slot="reg_number" slot-scope="row">{{row.value}}</template>
+            <template slot="brand" slot-scope="row">{{row.value}}</template>
+            <template slot="modell" slot-scope="row">{{row.value}}</template>
+            <template slot="booked" slot-scope="row">{{row.value===0 ? 'No' : 'Yes'}}</template>
+            <template slot="location" slot-scope="row">{{row.value ? row.value : ''}}</template>
+            <template slot="actions" slot-scope="row">
+                <!-- We use @click.stop here to prevent a 'row-clicked' event from also happening -->
+                <div>
+                    <b-button variant="danger" size="sm" @click="showInfo(row.item, row.index, $event.target)" class="mr-1">
+                        Delete car
                     </b-button>
-                    <b-button variant="info" size="sm" @click="onEdit(row)" style="width: 100px" class="mr-1">
-                        Edit
-                    </b-button>
-                    </div>
-                </template>
+                </div>
+            </template>
         </b-table>
         <b-row>
             <b-col md="6" class="my-1">
@@ -84,25 +82,26 @@
             <b-button class="modal-button" variant="danger" style="" @click="onDelete">Yes</b-button>
             <b-button class="modal-button" variant="outline-secondary" @click="hideModal">Cancel</b-button>
         </b-modal>
+
     </b-container>
 </template>
 
 <script>
     import { mapGetters, mapActions } from 'vuex';
-    import moment from 'moment';
-    import AddUserForm from './AddUserForm';
+    import AddCarForm from "./AddCarForm";
 
     export default {
-        name: 'UserList',
-        components: {AddUserForm},
+        name: 'CarsList',
+        components: {AddCarForm},
         data (){
             return {
                 fields: [
-                    { key: 'user_id', label: '#'},
-                    { key: 'name', label: 'Person Name', sortable: true, sortDirection: 'desc' },
-                    { key: 'email', label: 'Email', sortable: true, 'class': 'text-center' },
-                    { key: 'role', label: 'Role' },
-                    { key: 'created', label: 'Created date', sortable: true },
+                    { key: 'car_id', label: '#', sortable: true},
+                    { key: 'reg_number', label: 'Registration Number', sortable: true, sortDirection: 'desc' },
+                    { key: 'brand', label: 'Brand', sortable: true },
+                    { key: 'modell', label: 'Model', sortable: true },
+                    { key: 'booked', label: 'Booked', sortable: true },
+                    { key: 'location', label: 'location'},
                     { key: 'actions', label: 'actions'}
                 ],
                 filter: null,
@@ -113,15 +112,13 @@
                 perPage: 5,
                 currentPage: 1,
                 pageOptions: [ 5, 10, 15 ],
-                modalInfo: {title: '', content: '', userId: null},
-                options: [
-                    { value: 1, text: 'Admin' },
-                    { value: 2, text: 'User' },
-                ],
-            }
+                modalInfo: {title: '', content: '', carId: null},
+                geocoder: new google.maps.Geocoder
+
+        }
         },
         computed: {
-            ...mapGetters(['getUsers', 'getError']),
+            ...mapGetters(['getCars']),
             sortOptions () {
                 // Create an options list from our fields
                 return this.fields
@@ -130,24 +127,17 @@
             },
         },
         methods: {
-            ...mapActions(['deleteUser', 'fetchError']),
-            info (item) {
-                this.modalInfo.title = 'Delete user';
-                this.modalInfo.content = `Are you sure you want to delete the user: ${item.name}?`;
-                this.modalInfo.userId = item.user_id;
-                this.showModal();
-            },
-            onDelete() {
-                this.deleteUser(this.modalInfo.userId);
-                this.hideModal();
-            },
+            ...mapActions(['deleteCar']),
             onFiltered (filteredItems) {
                 // Trigger pagination to update the number of buttons/pages due to filtering
                 this.totalRows = filteredItems.length
                 this.currentPage = 1
             },
-            formatDate(date) {
-                return moment(date).format('LLLL');
+            showInfo (item) {
+                this.modalInfo.title = 'Delete Car';
+                this.modalInfo.content = `Are you sure you want to delete the car: ${item.reg_number}?`;
+                this.modalInfo.carId = item.car_id;
+                this.showModal();
             },
             resetModal() {
                 this.modalInfo.title = '';
@@ -160,16 +150,14 @@
                 this.$refs.myModalRef.hide();
                 this.resetModal();
             },
-            onEdit(row){
-                console.log(row);
-            }
+            onDelete() {
+                this.deleteCar(this.modalInfo.carId);
+                this.hideModal();
+            },
         },
-        created() {
-            this.fetchError();
-        }
     }
-</script>
 
+</script>
 <style scoped>
     .modal-button {
         margin-right: 10px;
